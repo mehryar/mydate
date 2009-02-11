@@ -1,0 +1,139 @@
+NAME
+    MyDate - An object oriented very simple Date class.
+
+SYNOPSIS
+      use MyDate;
+
+      # simple date arithmetic: what could be simpler than this?
+
+      $d = MyDate->today;
+      print "Tomorrow is ", $d + 1;
+
+      $christmas = MyDate->new("2006-12-24"); 
+      # or
+      $christmas = MyDate->new(2006,12,14);
+
+      $days_to_xmas = 0;
+      while ($d++ < $christmas) {
+          ++$days_to_xmas;
+      }
+      print "There are ", $days_to_xmas, " days remaining until Christmas";
+
+DESCRIPTION
+    This is a very simple Date class to allow a simple interface to the most
+    basic type of date calculations. Only a few types of methods are
+    available for now. The class overloads a few arithmetic operators to
+    allow the simpler interface to date calculations. It only expects do to
+    simple date calculations in the same time zone as is defined by your
+    system or Perl, so don't expect to do any timezone calculations with
+    this module.
+
+  new()
+      $date = MyDate->new;   # sets $date to today
+      $date = MyDate->today; # same thing
+      $date = MyDate->now;   # sets $date to today and time to now
+
+    there are a few convenient ways to initialize a date object to a
+    particular date:
+
+      $xmas = MyDate->new("2006-12-24"); # sql like date
+      $xmas = MyDate->new(2006,12,24);   # Date::Calc like date
+      $xmas = MyDate->new($another_date_object); # Date::Calc like date
+
+      $meeting_at = MyDate->new(2006,12,24,7,45,00);
+      $meeting_at = MyDate->new($another_date_object . " 07:45:00");
+
+  add_day(), add_hour(), add_min(), add_sec(), add_month()
+    Adds a day (or hour or min etc) to the date. Or if you give it the
+    number of days/hours/minutes etc to add. Does not modify the original
+    date object but returns a new date object after the performing the
+    calculations.
+
+      $today = MyDate->new("2006-01-30");
+      $tomorrow = $today->add_day;
+
+      print "Tomorrow is $tomorrow\n";
+      print "but today is still $today";
+
+      # should print something like:
+      # Tomorrow is 2006-01-31
+      # but today is still 2006-01-30
+
+      $day_after_tomorrow = $today->add_day( 2 );
+
+      $date = $today->add_min;
+      print $date;
+      # will print "2006-01-31 12:25:21"
+      # basically adds 1 min to the current datetime object.
+
+      $date = $today->add_month;
+      # will advance your date to the same day next month.
+      so $date = MyDate->new("2001-01-01");
+      $date->add_month will become "2001-02-01"
+
+      but $date = MyDate->new("2001-01-31")
+      $date->add_month will become "2001-02-29"
+      it should account correctly for leap years.
+
+  subtract_day()
+    Subtract day subtracts a day from your date. There is no subtract_hour,
+    subtract_min etc. Because subtract_day is just an alias to add_day
+    anyway. You can basically use a negative argument to subtract
+    min,hour,sec etc.
+
+      $yesterday = $today->subtract_day;
+      $five_minutes_ago = $today->add_min( -5 );
+
+  + -
+    + - are overloaded to use add_day or substract_day.
+
+    So you can do things like:
+
+      $date_next_year = $date + 365;
+
+  compare (<, <=, >=, >, <=>)
+    uses a dates time value to compare two dates.
+
+      my $d1 = MyDate->new("2006-01-01 3:45:00");
+      my $d2 = MyDate->new("2006-01-01 3:46:00");
+      if ($d2 > $d1) {
+         print "d2 is greater than d1\n";
+      }
+
+  day_name | day_name_short
+      $date = MyDate->new("2001-01-01");
+      print "Jan 1st 2001 was a ", $date->day_name;
+      prints "Jan 1st 2001 was a Monday";
+
+      $date->day_name_short; returns the short name (first 3 characters).
+
+  as_string, to_s, to_date, to_datetime
+    The date object overloads stringification to print out the date in a sql
+    dateformat.
+
+      print $date->as_string; # prints "2006-01-01";
+      print "date is $date";  # print "date is 2006-01-01"
+
+    to_s is a Ruby-esque alias for the Java-esque as_string.
+
+    as_date returns just the date part of a date object. as_datetime returns
+    the date and time.
+
+BUGS AND LIMITATIONS
+    This module is considered experimental at the moment, so even though I
+    don't know of any bugs in the code, use at your own risk. I find this
+    module very convenient to use but I've developed this with the 
+    XP practice of
+    <a ref="http://c2.com/xp/YouArentGonnaNeedIt.html">YAGNIL</a>
+    "Always implement things when you actually need them, never when you just
+    foresee that you need them."
+
+    $date->add_year is not implemented yet, since I haven't had to use it
+    yet. :-)
+
+SEE ALSO
+    t/01.t - the test script to see examples of the interface being used.
+
+AUTHOR
+    mehryar@mehryar.com
+
