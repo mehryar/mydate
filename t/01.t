@@ -7,6 +7,7 @@ use MyDate;
 use Data::Dumper;
 
 my ($d,$d1,$d2,$d3);
+
 #--------------------------------------------------
 # defining the interface
 #--------------------------------------------------
@@ -134,73 +135,6 @@ my $diff;
 }
 
 #--------------------------------------------------
-# date comparisons
-#--------------------------------------------------
-{
-    $d1 = MyDate->new('2001-01-01');
-    $d2 = MyDate->new('2001-01-02');
-    $d3 = MyDate->new('2001-01-03');
-    ok ($d2 > $d1,
-        '$d2 > $d1');
-    ok ($d2 < $d3,
-        '$d2 < $d3');
-    ok ($d2 == $d2,
-        '$d2 == $d2');
-}
-
-#--------------------------------------------------
-# add month bug
-#--------------------------------------------------
-{
-    $d1 = MyDate->new('2001-01-01');
-    $d2 = MyDate->new('2001-01-02');
-    ok ($d1 < $d2,
-        '$d1 < $d2 - add_month bug d1 is less than d2');
-    $d1 = $d1->add_month;
-    ok ($d1 > $d2,
-        '$d1 > $d2 - d1 = d1 + 1 month: now d1 is greater than d2');
-}
-
-#--------------------------------------------------
-# another add month bug
-#--------------------------------------------------
-{
-    $d1 = MyDate->new('2001-09-01');
-
-    $d2 = $d1->add_month(1);
-    is ($d2->as_string,'2001-10-01',
-        '2001-09-01 + 1 month = 2001-10-01');
-
-    $d2 = $d1->add_month(4);
-    is ($d2->as_string,'2002-01-01',
-        '2001-09-01 + 4 month = 2002-01-01');
-
-    $d2 = $d1->add_month(11);
-    is ($d2->as_string,'2002-08-01',
-        '2001-09-01 + 11 month = 2002-08-01');
-
-    $d2 = $d1->add_month(12);
-    is ($d2->as_string,'2002-09-01',
-        '2001-09-01 + 12 month = 2002-09-01');
-
-    $d2 = $d1->add_month(13);
-    is ($d2->as_string,'2002-10-01',
-        '2001-09-01 + 13 month = 2002-10-01');
-
-    $d2 = $d1->add_month(15);
-    is ($d2->as_string,'2002-12-01',
-        '2001-09-01 + 15 month = 2002-12-01');
-
-    $d2 = $d1->add_month(16);
-    is ($d2->as_string,'2003-01-01',
-        '2001-09-01 + 16 month = 2003-01-01');
-
-    $d2 = $d1->add_month(24);
-    is ($d2->as_string,'2003-09-01',
-        '2001-09-01 + 24 month = 2003-09-01');
-}
-
-#--------------------------------------------------
 # simple accessors
 #--------------------------------------------------
 {
@@ -285,117 +219,4 @@ my $diff;
     $d2 = $d1->add_sec( $increment );
     is ($d2->as_string, $expected,
         "$start + $increment sec = $expected");
-}
-
-#--------------------------------------------------
-# add days
-#--------------------------------------------------
-{
-    $start     = '2001-01-01';
-    $increment = 1;
-    $expected  = '2001-01-02';
-    $d1 = MyDate->new($start);
-    $d2 = $d1->add_day( $increment );
-    is ($d2->as_string, $expected,
-        "$start + $increment day = $expected");
-
-    $start     = '2001-02-28';
-    $increment = 1;
-    $expected  = '2001-03-01';
-    $d1 = MyDate->new($start);
-    $d2 = $d1->add_day( $increment );
-    is ($d2->as_string, $expected,
-        "$start + $increment day = $expected");
-
-    # leap year
-    $start     = '2000-02-28';
-    $increment = 1;
-    $expected  = '2000-02-29';
-    $d1 = MyDate->new($start);
-    $d2 = $d1->add_day( $increment );
-    is ($d2->as_string, $expected,
-        "$start + $increment day = $expected");
-
-    # turn of the year
-    $start     = '2000-12-31';
-    $increment = 1;
-    $expected  = '2001-01-01';
-    $d1 = MyDate->new($start);
-    $d2 = $d1->add_day( $increment );
-    is ($d2->as_string, $expected,
-        "$start + $increment day = $expected");
-
-}
-
-#--------------------------------------------------
-# $date->day_name (Monday) and $date->day_name_short (Mon)
-#--------------------------------------------------
-{
-    $start_date = "2001-01-01";
-    $expected = "Monday";
-    $d = MyDate->new($start_date);
-    is ($d->day_name, $expected,
-        "$start_date is a $expected");
-    is ($d->day_name_short, "Mon",
-        "$start_date is a Mon");
-
-    $start_date = "2000-02-29";
-    $expected = "Tuesday";
-    $d = MyDate->new($start_date);
-    is ($d->day_name, $expected,
-        "$start_date is a $expected");
-    is ($d->day_name_short, "Tue",
-        "$start_date is a Tue");
-}
-
-#--------------------------------------------------
-# $date->subtract_day
-#--------------------------------------------------
-{
-    $start_date = "2001-01-01";
-    $expected   = "2000-12-30";
-    $d = MyDate->new($start_date);
-    $d1 = $d->subtract_day(2);
-    is ($d1->as_string,$expected,
-        "\$date->substract_day");
-
-    $d = MyDate->new($start_date);
-    $d1 = $d - 2;
-    is ($d1->as_string,$expected,
-        "\$date - 2");
-}
-
-#--------------------------------------------------
-# subtracting two dates
-#--------------------------------------------------
-{
-    $d1 = MyDate->new("2001-01-01");
-    $d2 = MyDate->new("2001-01-02");
-    $diff = $d2 - $d1;
-    is ($diff->seconds, 24 * 60 * 60,
-        "2001-01-02 - 2001-01-01 = 86400 seconds");
-    is ($diff->minutes, 24 * 60,
-        "2001-01-02 - 2001-01-01 = 1440 minutes");
-    is ($diff->hours, 24,
-        "2001-01-02 - 2001-01-01 = 24 hours");
-    is ($diff->days, 1,
-        "2001-01-02 - 2001-01-01 = 1 day");
-
-    $d1 = MyDate->new("1972-03-19");
-    $d2 = MyDate->new("2007-08-29");
-    $diff = $d2 - $d1;
-    is ($diff->weeks,1849,
-        "2007-08-29 - 1972-03-19 = 1849 weeks");
-    is ($diff->months,35 * 12 + 4,
-        "2007-08-29 - 1972-03-19 = 424 months");
-    is ($diff->years,35,
-        "2007-08-29 - 1972-03-19 = 35 years");
-
-    $expected = 1;
-    $d1 = MyDate->new("2001-01-01 00:00:00");
-    $d2 = MyDate->new("2001-01-01 00:00:01");
-    $diff = $d2 - $d1;
-    is ($diff->seconds, $expected,
-        "2001-01-01 00:00:01 - 2001-01-01 00:00:00 = 1 sec");
-
 }
